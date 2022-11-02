@@ -1,0 +1,44 @@
+PUT http://localhost:3001/api/persons/635f8bb4c8e88c63f85ad1e6
+Content-Type: application/json
+
+{
+    "name": "Laura",
+    "phone": "39408290384029348"
+}
+
+
+
+###
+
+PUT http://localhost:3001/api/persons/635f8bb4c8e88c63f85ad1e6
+Content-Type: application/json
+
+{
+    "phone": "298743895743453"
+}
+
+
+
+###
+
+PUT http://localhost:3001/api/persons/aslfksdlkfjskldjf
+Content-Type: application/json
+
+{
+    "name": "Anna",
+    "phone": "444888777333"
+}
+
+
+
+###
+
+
+
+PUT http://localhost:3001/api/persons/635f8bb4c8e88c63f85ad2e0
+Content-Type: application/json
+
+{
+    "name": "Anna",
+    "phone": "444888777333"
+}

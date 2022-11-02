@@ -1,2 +1,22 @@
+###############################################################
+
 GET http://localhost:3001/api/persons
-# Content-Type: application/json
+# GET ALL STORED PERSONS
+
+
+###############################################################
+
+GET http://localhost:3001/api/persons/635f88e79e98438169c90eb0
+# GET SINGLE PERSON, BY ID (OK)
+
+
+###############################################################
+
+GET http://localhost:3001/api/persons/635f88e79e98438169c90eb3
+# GET SINGLE PERSON, BY ID (NOT FOUND)
+
+
+###############################################################
+
+GET http://localhost:3001/api/persons/allkdsflksjflksjdfkljsdf
+# GET SINGLE PERSON, BY ID (MALFORMATTED ID)

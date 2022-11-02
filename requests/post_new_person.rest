@@ -2,6 +2,43 @@ POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "name": "Joel Rmm",
-    "phone": "237459845784"
+    "name": "Anastasia",
+    "phone": "2374525335659845784"
+}
+
+
+
+###
+
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Clara",
+    "phone": "237452533asdfkdslf5659845784"
+}
+
+
+
+###
+
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "phone": "9845798345984537"
+}
+
+
+
+###
+
+
+
+POST http://localhost:3001/api/persons/
+Content-Type: application/json
+
+{
+    "name": "Correcto!222",
+    "phone": "329049872398472308"
 }
