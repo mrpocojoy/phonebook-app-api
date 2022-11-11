@@ -1,16 +1,25 @@
-PUT http://localhost:3001/api/persons/635f8bb4c8e88c63f85ad1e6
+###############################################################
+
+GET http://localhost:3001/api/persons
+# GET ALL STORED PERSONS
+
+
+###############################################################
+
+
+PUT http://localhost:3001/api/persons/6362a791aa442f97b50489f5
 Content-Type: application/json
 
 {
-    "name": "Laura",
-    "phone": "39408290384029348"
+    "name": "Hola",
+    "phone": "333333384029348"
 }
 
 
 
 ###
 
-PUT http://localhost:3001/api/persons/635f8bb4c8e88c63f85ad1e6
+PUT http://localhost:3001/api/persons/6362428a06812a03b4e21e5a
 Content-Type: application/json
 
 {

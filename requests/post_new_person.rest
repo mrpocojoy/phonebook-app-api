@@ -1,9 +1,18 @@
+###############################################################
+
+GET http://localhost:3001/api/persons
+# GET ALL STORED PERSONS
+
+
+###############################################################
+
+
 POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
     "name": "Anastasia",
-    "phone": "2374525335659845784"
+    "phone": "3329999999"
 }
 
 
@@ -14,8 +23,8 @@ POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "name": "Clara",
-    "phone": "237452533asdfkdslf5659845784"
+    "name": "Laura",
+    "phone": "45453"
 }
 
 
@@ -39,6 +48,5 @@ POST http://localhost:3001/api/persons/
 Content-Type: application/json
 
 {
-    "name": "Correcto!222",
-    "phone": "329049872398472308"
+    "name": "IN Correcto!222"
 }

@@ -1,3 +1,13 @@
+GET http://localhost:3001/api/persons
+
+###
+
+DELETE http://localhost:3001/api/persons/6362a791aa442f97b50489f5
+# REMOVE ONE USER (OK)
+
+####
+
+
 DELETE http://localhost:3001/api/persons/635fb404ccda24d9af7d02e3
 # REMOVE ONE USER (NOT FOUND ID -404)
 
@@ -6,9 +16,5 @@ DELETE http://localhost:3001/api/persons/635fb404ccda24d9af7d02e3
 DELETE http://localhost:3001/api/persons/KADFJLKSDJFLKSDJF
 # REMOVE ONE USER (MISSPELLED ID - 500)
 
-###
-
-DELETE http://localhost:3001/api/persons/6360c5fdecd37233353439f0
-# REMOVE ONE USER (OK)
 
 ###

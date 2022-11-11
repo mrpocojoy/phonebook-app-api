@@ -1,29 +1,48 @@
 require('dotenv').config()
-
-const express = require('express')
-const morgan = require('morgan')
-const cors = require('cors')
-const requestLogger = require('./loggerMiddleware')
-
-// MONGOOSE MODELS
-const Person = require('./models/person')
-// ...
-
-const app = express()
 const PORT = process.env.PORT
 
+const express = require('express')
+const app = express()
+const cors = require('cors')
+
+const morgan = require('morgan')
+const consoleLogger = require('./middleware/console-logger')
+const notFound = require('./middleware/not-found')
+const handleErrors = require('./middleware/handle-errors')
+
+
+
+/*****************************************
+ *  PORT LISTENER
+*****************************************/
 app.listen(PORT, () => {
-	console.log(`Server running on port ${PORT}`)
+	console.clear()
+	console.log('\n************************************')
+	console.log(`RELOAD. Server running on port ${PORT}`)
+	console.log('************************************\n')
 })
 
 
 
 /*****************************************
- *  MIDDLEWARES
+ *  MONGO DB
+*****************************************/
+const connectDB = require('./mongo.js')
+const Person = require('./models/Person.js')
+
+connectDB()
+
+
+
+/*****************************************
+ *  HELPER MIDDLEWARES
 ****************************************/
 
 // Search for static frontend build (./build)
 app.use(express.static('build'))
+
+// Serve static content in /images folder to API
+app.use('/images', express.static('images'))
 
 // Convert requests' body information to JSON
 app.use(express.json())
@@ -31,132 +50,139 @@ app.use(express.json())
 // Adding a custom formatted logs to server console
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 morgan.token('content', (request) => JSON.stringify(request.body))
-app.use(requestLogger)
+app.use(consoleLogger)
 
 // Enabling CROSS-ORIGIN requests
-app.use(cors())
-
+const corsOptions = {
+	origin: '*',
+	optionsSuccessStatus: 200
+	// origin: function (origin, callback) {
+	//   // db.loadOrigins is an example call to load a list of origins from a backing database
+	//   db.loadOrigins(function (error, origins) {
+	//     callback(error, origins)
+	//   })
+	// }
+}
+app.use(cors(corsOptions))
 
 
 
 /*****************************************
- *  ... GET ROUTES
-****************************************/
+ *  ROUTE CONTROLLERS
+*****************************************/
 
+
+/*****  GET  *****/
+
+// Obtain total number of entries in phonebook
 app.get('/info', (request, response, next) => {
 	Person
 		.find({})
-		.then(result => {
-			response.status(200).send((result.length)
-				? `Phonebook contains info about ${result.length} people <br/><br/> ${new Date()}`
+		.then(people => {
+			const msg = (people.length)
+				? `Phonebook contains info about ${people.length} people <br/><br/> ${new Date()}`
 				: `Phonebook is currently empty <br/><br/> ${new Date()}`
-			)
+
+			response.send(msg)
 		})
 		.catch(error => next(error))
 })
 
+
+// Obtain all contacts from DB
 app.get('/api/persons', (request, response, next) => {
 	Person
 		.find({})
-		.then(result => response.json(result))
+		.then(people => response.json(people))
 		.catch(error => next(error))
 })
 
+
+// Obtain specific contact from DB, based on personID
 app.get('/api/persons/:id', (request, response, next) => {
 	Person
 		.findById(request.params.id)
-		.then(result => {
-			if (!result)
-				return next()
-
-			response.json(result)
+		.then(person => {
+			return person
+				? response.json(person)
+				: next('ID not found')
 		})
 		.catch(error => next(error))
 })
 
 
-/*****************************************
- *  ...POST ROUTES
-****************************************/
 
+/*****  POST  *****/
+
+// Add new contact to DB, based on request.body
 app.post('/api/persons', (request, response, next) => {
 
-	const mandatoryFields = ['name', 'phone']
+	const reqBody = request.body
 
-	mandatoryFields.forEach(elem => {
-		if (elem in request.body === false)
-			throw `Missing mandatory field -> ${elem}`
+	const newPerson = new Person({
+		name: reqBody.name,
+		phone: reqBody.phone,
 	})
 
-	const { name, phone } = request.body
-
-	Person
-		.findOne({ name })
-		.then(result => {
-			if (result !== null)
-				throw 'Name must be unique.'
-
-			new Person({ name, phone })
-				.save()
-				.then(result => response.status(201).json(result))
-				.catch(error => next(error))
-		})
+	newPerson
+		.save()
+		.then(savedPerson => response.status(201).json(savedPerson))
 		.catch(error => next(error))
+
+	// Person
+	// 	.findOne({ name: request.body.name })
+	// 	.then(person => {
+	// 		return person !== null
+	// 			? next('Name must be unique.')
+	// 			: new Person({ ...request.body })
+	// 				.save()
+	// 				.then(result => response.status(201).json(result))
+	// 				.catch(error => next(error))
+	// 	})
+	// 	.catch(error => next(error))
 })
 
 
-/*****************************************
- *  ...PUT ROUTES
-****************************************/
 
+/*****  PUT  *****/
+
+// Edit existing contact in DB, based on personID
 app.put('/api/persons/:id', (request, response, next) => {
 	Person
-		.findByIdAndUpdate(request.params.id, { ...request.body }, { new: true })
-		.then(result => {
-			if (!result)
-				return next()
-
-			response.json(result)
+		.findByIdAndUpdate(request.params.id, { ...request.body }, { new: true, runValidators: true })
+		.then(updatedPerson => {
+			return updatedPerson
+				? response.json(updatedPerson)
+				: next('ID not found')
 		})
 		.catch(error => next(error))
 })
 
 
-/*****************************************
- *  ...DELETE ROUTES
-****************************************/
 
+/*****  DELETE  *****/
+
+// Delete existing contact in DB, based on personID
 app.delete('/api/persons/:id', (request, response, next) => {
 	Person
 		.findByIdAndDelete(request.params.id)
-		.then(result => {
-			if (!result)
-				return next()
-
-			response.status(204).json(result)
+		.then(deletedPerson => {
+			return deletedPerson
+				? response.status(204).json(deletedPerson)
+				: next('ID not found')
 		})
 		.catch(error => next(error))
 })
 
 
 
-
 /*****************************************
- *  HTTP 4XX HANDLERS
+ *  ERROR HANDLERS
 ****************************************/
 
 // 404 - UNKNOWN ENDPOINT
-app.use((request, response) => {
-	response.status(404).send({ error: 'HTTP404 - Unknown Endpoint.' })
-})
+app.use(notFound)
 
+// OTHER ERRORS
+app.use(handleErrors)
 
-// 400 - BAD CLIENT REQUEST
-app.use((error, request, response, next) => {
-	console.error("Error message", error.message)
-
-	if (error.name === 'CastError')
-		return response.status(400).send({ error: 'Wrong ID Format.' })
-
-	return response.status(400).send({ error })
-})
